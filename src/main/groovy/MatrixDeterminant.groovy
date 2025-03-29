@@ -29,21 +29,16 @@ static void main(String[] args) {
 }
 
 def static getDeterminant(matrix, size) {
-
   // Validate that the matrix is square
   if (matrix.any { it.size() != size }) {
     throw new IllegalArgumentException("Matrix must be square")
   }
 
-  if (size == 1) {
-    return matrix[0][0]
-  }
+  if (size == 1) return matrix[0][0]
 
-  if (size == 2) {
-    return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
-  }
+  if (size == 2) return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
 
-  def rest = 0;
+  def rest = 0
 
   for (col in 0..<size) {
     def subMatrix = createSubMatrix(matrix, size, col)
