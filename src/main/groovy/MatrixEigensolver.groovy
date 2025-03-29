@@ -70,7 +70,7 @@ static List<Double> getSolutionOfQuadratic(List<List<Double>> m) {
     def b = -(m[0][0] + m[1][1])
     def c = m[0][0] * m[1][1] - m[0][1] * m[1][0]
 
-    def discriminant = b * b - 4 * a * c
+    def discriminant = b * b - 4.0 * a * c
 
     // Check for complex eigenvalues
     if (discriminant < 0) {
@@ -170,7 +170,7 @@ static Map findEigenspace(List<List<Double>> matrix, Double eigenvalue) {
         }
     }
 
-    // Find null space (A-λI)x = 0
+    // Find null space (A - λI)x = 0
     def basis = findNullSpace(aMinus)
 
     return [eigenvalue: eigenvalue, basis: basis]
