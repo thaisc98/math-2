@@ -1,16 +1,39 @@
-
 class MatrixEigensolver {
 
     static void main(String[] args) {
-        // Example matrix - replace with your own
+        // Example matrix 0 - 2x2 matrix
 //        def matrix = [
-//                [4, -5],
-//                [2, -3]
+//                [7, 3],
+//                [3, -1]
 //        ]
-        def matrix =[
-                [3, 6],
-                [2,1]
+
+        // Example matrix 1 - 2x2 matrix
+        def matrix = [
+                [4, -5],
+                [2, -3]
         ]
+
+         //Example matrix 2 - 2x2 matrix with complex eigenvalues
+
+//        def matrix =[
+//                [0, -1],
+//                [1,0]
+//        ]
+
+        //Example matrix 3 - 3x3 matrix
+
+//        def matrix = [
+//                [2, 2, -2],
+//                [1, 3, -1],
+//                [-1, 1, 1],
+//        ]
+
+        // Example matrix 4: 3x3 triangular matrix
+//        def matrix = [
+//                [1, 2,4],
+//                [0, 4, 7],
+//                [0, 0, 6],
+//        ]
 
 
         println "Original Matrix:"
@@ -20,104 +43,143 @@ class MatrixEigensolver {
         def eigenvalues = findEigenvalues(matrix)
         println "\nEigenvalues:"
         eigenvalues.eachWithIndex { val, i ->
-            println "fλ${i+1} = ${val}"
+            println "λ${i + 1} = ${val}"
         }
 
         // Step 2: Find eigenvectors and eigenspaces
         println "\nEigenvectors and Eigenspaces:"
-        eigenvalues.each { λ ->
-            def eigenspace = findEigenspace(matrix, λ)
-            println "\nFor eigenvalue λ = ${λ}:"
+        eigenvalues.eachWithIndex { eigenvalue, i ->
+            def eigenspace = findEigenspace(matrix, eigenvalue)
+            println "\nFor eigenvalue λ${i + 1} = ${eigenvalue}:"
             println "Eigenvectors: ${eigenspace.basis}"
             println "Eigenspace: span${eigenspace.basis}"
         }
     }
 
-    // Finds eigenvalues by solving the characteristic polynomial
-    static List<Number> findEigenvalues(List<List<Number>> matrix) {
+    // Finding eigenvalues
+    static def findEigenvalues(List<List<Double>> matrix) {
         if (matrix.size() == 2 && matrix[0].size() == 2) {
-            return solveQuadratic(matrix)
+            return getSolutionOfQuadratic(matrix)
         } else if (matrix.size() == 3 && matrix[0].size() == 3) {
-            return solveCubic(matrix)
-        } else {
-            throw new UnsupportedOperationException("Only 2x2 and 3x3 matrices are supported in this implementation")
+            return getSolutionOfCubic(matrix)
         }
+        throw new IllegalArgumentException("Matrix must be quadratic or cubic (2x2 or 3x3)")
     }
 
-    // Solves eigenvalues for 2x2 matrix: [ [a, b], [c, d] ]
-    static List<Number> solveQuadratic(List<List<Number>> m) {
-        def a = 1
+    //  [ [a, b], [c, d] ]
+    static List<Double> getSolutionOfQuadratic(List<List<Double>> m) {
+        def a = 1.0
         def b = -(m[0][0] + m[1][1])
-        def c = m[0][0]*m[1][1] - m[0][1]*m[1][0]
+        def c = m[0][0] * m[1][1] - m[0][1] * m[1][0]
 
-        def discriminant = b*b - 4*a*c
+        def discriminant = b * b - 4 * a * c
 
-        if (discriminant >= 0) {
-            def lambda1 = (-b + Math.sqrt(discriminant)) / (2*a)
-            def lambda2 = (-b - Math.sqrt(discriminant)) / (2*a)
-            return [lambda1, lambda2]
-        } else {
-            def realPart = -b / (2*a)
-            def imagPart = Math.sqrt(-discriminant) / (2*a)
-            return [new ComplexNumber(realPart, imagPart),
-                    new ComplexNumber(realPart, -imagPart)]
+        // Check for complex eigenvalues
+        if (discriminant < 0) {
+            throw new ArithmeticException("Matrix must be real eigenvalues, complex eigenvalues not supported in this implementation.")
         }
+
+        def eigenvalueOne = (-b + Math.sqrt(discriminant)) / (2.0 * a)
+        def eigenvalueTwo = (-b - Math.sqrt(discriminant)) / (2.0 * a)
+        return [eigenvalueOne, eigenvalueTwo]
     }
 
-    // Solves eigenvalues for 3x3 matrix (simplified implementation)
-    static List<Number> solveCubic(List<List<Number>> m) {
-        // This is a simplified implementation that only finds real roots
-        // For a complete solution, we'd need to implement the full cubic formula
+    // Solves eigenvalues for 3x3 matrix
+    static List<Double> getSolutionOfCubic(List<List<Double>> m) {
+        // First check if matrix is triangular
+        if (isTriangular(m)) {
+            // For triangular matrices, return diagonal elements
+            println("Matrix is triangular, eigenvalues are diagonal elements.")
+            return (0..<m.size()).collect { m[it][it] }
+        }
         def a = m[0][0], b = m[0][1], c = m[0][2]
         def d = m[1][0], e = m[1][1], f = m[1][2]
         def g = m[2][0], h = m[2][1], i = m[2][2]
 
         // Coefficients for characteristic equation: λ³ + Aλ² + Bλ + C = 0
         def A = -(a + e + i)
-        def B = a*e + a*i + e*i - b*d - c*g - f*h
-        def C = -(a*e*i + b*f*g + c*d*h - a*f*h - b*d*i - c*e*g)
+        def B = a * e + a * i + e * i - b * d - c * g - f * h
+        def C = -(a * e * i + b * f * g + c * d * h - a * f * h - b * d * i - c * e * g)
 
-        // Find roots numerically (for simplicity)
-        return findRealRoots(1, A, B, C)
+        // Find roots numerically
+        return findRealRoots(1.0, A, B, C)
     }
 
-    // Numerically find real roots of cubic equation (simplified)
-    static List<Number> findRealRoots(double a, double b, double c, double d) {
-        // This is a very basic root finder - in practice you'd want a more robust method
-        def roots = []
-        def step = 0.1
-        def range = 10.0
+    static isTriangular(List<List<Double>> m) {
+        def n = m.size()
+        boolean isUpper = true
+        boolean isLower = true
 
-        (-range..range).step(step) { x ->
-            def y = a*x*x*x + b*x*x + c*x + d
-            if (Math.abs(y) < 0.1) { // crude threshold
-                if (roots.every { Math.abs(it - x) > 0.5 }) { // avoid duplicates
+        // upper triangular
+        (1..<n).each { i ->
+            (0..<i).each { j ->
+                if (m[i][j] != 0) {
+                    isUpper = false
+                    return // break out of loop
+                }
+            }
+            if (!isUpper) return
+        }
+
+        // lower triangular (zeros above diagonal)
+        (0..<n-1).each { i ->
+            (i+1..<n).each { j ->
+                if (m[i][j] != 0) {
+                    isLower = false
+                    return // break out of loop
+                }
+            }
+            if (!isLower) return
+        }
+
+        return isUpper || isLower
+    }
+
+    // Find real roots of cubic equation
+    static List<Double> findRealRoots(double a, double b, double c, double d) {
+        def roots = []
+        double step = 0.01
+        double range = 10.0
+        double tolerance = 1e-6
+
+        // Convert to int steps to avoid BigDecimal issue
+        int numSteps = (range * 2 / step) as int
+
+        (0..numSteps).each { int i ->
+            double x = -range + (i * step)
+            double y = a * x * x * x + b * x * x + c * x + d
+
+            if (Math.abs(y) < tolerance) {
+                if (roots.every { Math.abs(it - x) > step * 2 }) {
                     roots << x
                 }
             }
         }
 
-        return roots.size() > 0 ? roots : [0] // fallback
+        if (roots.isEmpty()) {
+            throw new ArithmeticException("No real roots found - complex eigenvalues exist")
+        }
+        return roots
     }
 
-    // Finds eigenspace for a given eigenvalue
-    static Map findEigenspace(List<List<Number>> matrix, Number λ) {
+    // Finds eigenspace
+    static Map findEigenspace(List<List<Double>> matrix, Double eigenvalue) {
         // Create A - λI matrix
         def n = matrix.size()
         def aMinus = (0..<n).collect { i ->
             (0..<n).collect { j ->
-                matrix[i][j] - (i == j ? λ : 0)
+                matrix[i][j] - (i == j ? eigenvalue : 0)
             }
         }
 
-        // Find null space (solutions to (A-λI)x = 0)
+        // Find null space (A-λI)x = 0
         def basis = findNullSpace(aMinus)
 
-        return [eigenvalue: λ, basis: basis]
+        return [eigenvalue: eigenvalue, basis: basis]
     }
 
     // Finds null space of a matrix (simplified implementation)
-    static List<List<Number>> findNullSpace(List<List<Number>> matrix) {
+    static List<List<Double>> findNullSpace(List<List<Double>> matrix) {
         // This is a simplified implementation that works for 2x2 and simple cases
         def n = matrix.size()
 
@@ -126,74 +188,35 @@ class MatrixEigensolver {
             def c = matrix[1][0], d = matrix[1][1]
 
             // Handle zero matrix case
-            if ([a,b,c,d].every { it == 0 }) {
-                return [[1, 0], [0, 1]]
+            if ([a, b, c, d].every { it == 0 }) {
+                return [[1.0, 0.0], [0.0, 1.0]]
             }
 
-            // If one row is multiple of another
-            if (a != 0 && c != 0 && b/a == d/c) {
-                def ratio = c/a
+            // If rows are linearly dependent
+            if (Math.abs(a * d - b * c) < 1e-10) {
                 if (b != 0) {
-                    return [[-b/a, 1]]
-                } else {
-                    return [[-d/c, 1]]
-                }
-            }
-
-            // If one column is multiple of another
-            if (a != 0 && b != 0 && c/a == d/b) {
-                return [[-a/b, 1]]
-            }
-
-            // General solution for 2x2
-            if (a*d - b*c == 0) { // determinant is zero
-                if (b != 0) {
-                    return [[-b/a, 1]]
+                    return [[-b / a, 1.0]]
                 } else if (d != 0) {
-                    return [[-d/c, 1]]
+                    return [[-d / c, 1.0]]
                 } else {
-                    return [[1, 0]]
+                    return [[1.0, 0.0]]
                 }
             }
         }
 
-        // For 3x3 or more complex cases, we would need proper Gaussian elimination
-        // This is a simplified version that returns a default vector
+        // For 3x3 matrices
+        if (n == 3) {
+            // Real implementation would need Gaussian elimination
+            return [[1.0, 0.0, 0.0], [0.0, 1.0, 0.0], [0.0, 0.0, 1.0]]
+        }
+
+        //  default vector
         return [[1] * n] // fallback - returns vector of 1s
     }
 
     static void printMatrix(matrix) {
         matrix.each { row ->
-            println row.collect { it instanceof ComplexNumber ? it.toString() : it }.join("\t")
+            println row.join("\t")
         }
-    }
-}
-
-// Helper class for complex numbers
-class ComplexNumber {
-    double real
-    double imaginary
-
-    ComplexNumber(double real, double imaginary = 0) {
-        this.real = real
-        this.imaginary = imaginary
-    }
-
-    Number minus(Number n) {
-        new ComplexNumber(real - n, imaginary)
-    }
-
-    String toString() {
-        if (imaginary == 0) return real.toString()
-        if (real == 0) return "${imaginary}i"
-        "${real} + ${imaginary}i"
-    }
-
-    boolean equals(Object other) {
-        if (other instanceof Number) return real == other && imaginary == 0
-        if (other instanceof ComplexNumber) {
-            return real == other.real && imaginary == other.imaginary
-        }
-        false
     }
 }

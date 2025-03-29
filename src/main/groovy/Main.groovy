@@ -6,11 +6,11 @@ static void main(String[] args) {
 //    ]
 
 
-  //    def mat = [
-//            [ 1, 0, 2],
-//            [ 3, 0, 0],
-//            [ 2, 1, 4],
-//    ]
+      def mat = [
+            [ 1, 0, 2],
+            [ 3, 0, 0],
+            [ 2, 1, 4],
+    ]
 
 //    def mat = [
 //            [ 1, 0, 2, -1 ],
@@ -19,11 +19,11 @@ static void main(String[] args) {
 //            [ 1, 0, 5, 0 ]
 //    ]
 
-  def mat = [
-          [0, 0, 0],
-          [0, 0, 0],
-          [0, 0, 0]
-  ]
+//  def mat = [
+//          [0, 0, 0],
+//          [0, 0, 0],
+//          [0, 0, 0]
+//  ]
 
   println("Determinant of the matrix is:  ${getDeterminant(mat, mat.size())} ")
 }
