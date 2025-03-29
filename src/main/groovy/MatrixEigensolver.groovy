@@ -19,14 +19,13 @@ static void main(String[] args) {
 //        ]
 
     //Example matrix 3 - 3x3 matrix
-
 //        def matrix = [
 //                [2, 2, -2],
 //                [1, 3, -1],
 //                [-1, 1, 1],
 //        ]
 
-    // Example matrix 4: 3x3 triangular matrix
+    // Example matrix 4 - 3x3 triangular matrix
 //        def matrix = [
 //                [1, 2,4],
 //                [0, 4, 7],
